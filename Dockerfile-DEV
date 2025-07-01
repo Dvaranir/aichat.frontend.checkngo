@@ -1,0 +1,19 @@
+FROM node:20-alpine3.19
+
+ARG RELEASE_VERSION
+ENV _RELEASE_VERSION=$RELEASE_VERSION
+
+# Create a new group and user
+RUN addgroup -S checkngo && adduser -S -G checkngo checkngo
+
+# Set the working directory and assign ownership to the new user
+WORKDIR /var/checkngo/web-app/ai-chat/frontend
+
+# Switch to the new user
+# USER checkngo
+
+# Expose port 3000 for vite dev server
+EXPOSE 3000
+
+# Start the vite dev server process
+CMD ["sh", "-c", "npm ci && npm run dev"]
