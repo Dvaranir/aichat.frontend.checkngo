@@ -91,7 +91,9 @@ class WebSocketService {
 	}
 
 	sendMessage(params) {
+        
 		if (this.socket && this.isConnected) {
+            console.log("Sending message:", params);
 			this.socket.emit("send_message", JSON.stringify(params));
 		} else {
 			console.error("Socket not connected");
