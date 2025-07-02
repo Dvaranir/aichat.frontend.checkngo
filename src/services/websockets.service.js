@@ -135,6 +135,32 @@ class WebSocketService {
 		});
 	}
 
+	fetchHistory() {
+		return new Promise((resolve, reject) => {
+			if (!window.__cng_common) {
+				reject(new Error("__cng_common not available"));
+				return;
+			}
+
+			const sessionGuid = window.__cng_common?.table_session_guid;
+			if (!sessionGuid) {
+				reject(new Error("table_session_guid not found"));
+				return;
+			}
+
+			const params = `tsguid=${encodeURIComponent(sessionGuid)}`;
+
+			window.__cng_common.ajax_call("GET", `/enp/ai_chat/get_history?${params}`, (data) => {
+				try {
+					const result = JSON.parse(data);
+					resolve(result);
+				} catch (error) {
+					reject(error);
+				}
+			});
+		});
+	}
+
 	on(event, callback) {
 		if (!this.callbacks[event]) {
 			this.callbacks[event] = [];
