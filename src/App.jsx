@@ -22,59 +22,12 @@ function App() {
 	const [isLoading, setIsLoading] = useState(true);
 	const inputRef = useRef(null);
 
-	const formatMessageFromHistory = (historyMessage) => {
-		const baseMessage = {
-			id: historyMessage.id,
-			text: historyMessage.text,
-			replyTo: historyMessage.reply_to ? {
-				author: historyMessage.reply_to.current_user ? "You" : getAuthorName(historyMessage.reply_to),
-				text: typeof historyMessage.reply_to.text === 'string' ? historyMessage.reply_to.text : JSON.stringify(historyMessage.reply_to.text)
-			} : null,
-			audio: null
-		};
-
-		if (historyMessage.type === 'user') {
-			return {
-				...baseMessage,
-				author: historyMessage.current_user ? "You" : getUserDisplayName(historyMessage),
-				avatar: historyMessage.current_user ? null : getUserAvatar(historyMessage)
-			};
-		} else if (historyMessage.type === 'bot') {
-			return {
-				...baseMessage,
-				author: "Carlos",
-				avatar: AiChatAvatar,
-				text: typeof historyMessage.text === 'string' ? historyMessage.text : JSON.stringify(historyMessage.text)
-			};
-		}
-
-		return baseMessage;
-	};
-
-	const getUserDisplayName = (message) => {
-		if (message.name_abbreviation) {
-			return message.name_abbreviation.text;
-		}
-		return "User";
-	};
-
-	const getUserAvatar = (message) => {
-		return null;
-	};
-
-	const getAuthorName = (message) => {
-		if (message.type === 'bot') return "Carlos";
-		if (message.current_user) return "You";
-		return getUserDisplayName(message);
-	};
-
 	useEffect(() => {
 		const loadHistory = async () => {
 			try {
 				const historyResult = await websocketService.fetchHistory();
 				if (historyResult.success && historyResult.messages) {
-					const formattedMessages = historyResult.messages.map(formatMessageFromHistory);
-					setMessages(formattedMessages);
+					setMessages(historyResult.messages);
 				}
 			} catch (error) {
 				console.error("Failed to load chat history:", error);
@@ -147,11 +100,10 @@ function App() {
 
 		const userMessage = {
 			id: Date.now(),
-			author: "You",
-			avatar: null,
 			text: inputValue,
-			audio: null,
-			replyTo: null
+			type: 'user',
+			current_user: true,
+			reply_to: null
 		};
 
 		setMessages(prev => [...prev, userMessage]);
@@ -196,31 +148,38 @@ function App() {
 				) : (
 					messages.map((message) => (
 						<div key={message.id} className={styles["message"]}>
-							{message.avatar && (
+							{message.type === 'bot' && (
 								<img
-									src={$static(message.avatar)}
-									alt='Person Avatar'
+									src={$static(AiChatAvatar)}
+									alt='AI Avatar'
 									className={styles["chat-avatar"]}
 								/>
 							)}
 							<div className={styles["message-content"]}>
 								<div className={styles['message-triangle']}></div>
-								<span className={styles["message-author"]}>{message.author}</span>
-								{message.replyTo && (
+								<span className={styles["message-author"]}>
+									{message.type === 'bot' ? 'Carlos' : 
+									 message.current_user ? 'You' : 
+									 message.author_name || 'User'}
+								</span>
+								{message.reply_to && (
 									<div className={styles["reply-container"]}>
-										<span className={styles["reply-author"]}>{message.replyTo.author}</span>
-										<span className={styles["reply-text"]}>{message.replyTo.text}</span>
+										<span className={styles["reply-author"]}>
+											{message.reply_to.type === 'bot' ? 'Carlos' :
+											 message.reply_to.current_user ? 'You' :
+											 message.reply_to.author_name || 'User'}
+										</span>
+										<span className={styles["reply-text"]}>
+											{typeof message.reply_to.text === 'string' ? 
+											 message.reply_to.text : 
+											 JSON.stringify(message.reply_to.text)}
+										</span>
 									</div>
 								)}
-								{message.audio && (
-									<audio
-										className={styles["message-audio"]}
-										src={message.audio}>
-										Your browser does not support the audio element.
-									</audio>
-								)}
 								<span className={styles["message-text"]}>
-									{message.text}
+									{typeof message.text === 'string' ? 
+									 message.text : 
+									 JSON.stringify(message.text)}
 								</span>
 							</div>
 						</div>
@@ -257,3 +216,4 @@ function App() {
 }
 
 export default App;
+									
