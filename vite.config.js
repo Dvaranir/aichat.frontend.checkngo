@@ -16,7 +16,6 @@ const generatePhpPlugin = () => ({
 
 export default defineConfig({
 	plugins: [react(), generatePhpPlugin()],
-	base: import.meta?.env?.VITE_BASE_URL ?? "https://yp-dev-static.checkngo.pro/ai-chat/",
 	server: {
 		port: 3000,
 		host: true,

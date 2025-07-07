@@ -3,7 +3,7 @@ import moment from "moment";
 import websocketService from "./services/websockets.service";
 
 //redux
-import { useSelector } from 'react-redux'
+import { useSelector } from "react-redux";
 
 //tools
 import { $static } from "./tools/helpers";
