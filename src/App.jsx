@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import moment from "moment";
 import websocketService from "./services/websockets.service";
 
+//redux
+import { useSelector } from 'react-redux'
+
 //tools
 import { $static } from "./tools/helpers";
 
@@ -21,6 +24,9 @@ function App() {
 	const [inputValue, setInputValue] = useState("");
 	const [isConnected, setIsConnected] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+
+	const productsCount = useSelector((state) => state.basket.productsCount);
+
 	const inputRef = useRef(null);
 
 	useEffect(() => {
@@ -137,7 +143,7 @@ function App() {
 						alt='Basket'
 						className={styles["basket-icon"]}
 					/>
-					<span className={styles["basket-count"]}>0</span>
+					<span className={styles["basket-count"]}>{productsCount}</span>
 				</div>
 				<img
 					src={GreyCross}
