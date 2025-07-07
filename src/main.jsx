@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { store } from "./app/store";
+import { store } from "./store/index.js";
+import { storeAPI } from "./store/api.js";
 import { Provider } from "react-redux";
 import App from "./App.jsx";
 import "./index.css";
@@ -25,6 +26,7 @@ function renderApp(elementId = "cng_ai_chat") {
 
 if (typeof window !== "undefined") {
 	window.renderCngAiChat = renderApp;
+	window.cngAiChatStore = storeAPI;
 
 	if (document.readyState === "loading") {
 		document.addEventListener("DOMContentLoaded", () => renderApp());
@@ -33,4 +35,4 @@ if (typeof window !== "undefined") {
 	}
 }
 
-export { renderApp };
+export { renderApp, storeAPI };
