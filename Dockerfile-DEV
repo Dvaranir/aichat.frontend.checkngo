@@ -16,4 +16,4 @@ WORKDIR /var/checkngo/web-app/ai-chat/frontend
 EXPOSE 3000
 
 # Start the vite dev server process
-CMD ["sh", "-c", "npm ci && npm run dev"]
+CMD ["sh", "-c", "npm ci && npm run debug"]
