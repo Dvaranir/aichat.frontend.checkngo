@@ -98,6 +98,7 @@
 .message-input {
 	font-size: 16px;
 	font-family: "Roboto", sans-serif;
+	width: 100%;
 }
 
 .microphone-icon {
@@ -114,6 +115,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
+	padding-bottom: 100px;
 }
 
 .message {
@@ -142,6 +144,11 @@
 	border-radius: 50%;
 }
 
+.message-user {
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+}
+
 .message-content {
 	position: relative;
 	background-color: white;
@@ -150,10 +157,18 @@
 	border-top-right-radius: 12px;
 	padding-left: 8px;
 	padding-top: 5px;
-	padding-bottom: 12px;
+	padding-bottom: 5px;
 	display: flex;
 	flex-direction: column;
 	gap: 7px;
+}
+
+.message-content-user {
+	background-color: #D8FDD2;
+	border-bottom-left-radius: 12px;
+	border-bottom-right-radius: 12px;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 0;
 }
 
 .message-author,
@@ -175,4 +190,25 @@
 .message-audio,
 .message-text{
 	padding-right: 12px;
+}
+
+.message-text-container{
+	display: flex;
+	flex-direction: column;
+}
+
+.message-triangle-user {
+	border-top: 20px solid #D8FDD2;
+	transform: rotate(-114deg);
+	left: auto;
+	right: -12px;
+}
+
+.message-time {
+	font-size: 14px;
+	color: #888;
+	align-self: flex-end;
+	margin-top: auto;
+	padding-right: 7px;
+	line-height: 1;
 }

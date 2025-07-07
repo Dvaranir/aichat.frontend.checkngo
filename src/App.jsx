@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import moment from "moment";
 import websocketService from "./services/websockets.service";
 
 //tools
@@ -55,11 +56,12 @@ function App() {
 				id: Date.now(),
 				author: "Carlos",
 				avatar: AiChatAvatar,
-				text: typeof data === 'string' ? data : JSON.stringify(data),
+				text: typeof data === "string" ? data : JSON.stringify(data),
 				audio: null,
-				replyTo: null
+				replyTo: null,
+				created_at: new Date().toISOString(),
 			};
-			setMessages(prev => [...prev, newMessage]);
+			setMessages((prev) => [...prev, newMessage]);
 		};
 
 		const handleAiError = (data) => {
@@ -69,29 +71,30 @@ function App() {
 				avatar: AiChatAvatar,
 				text: `Error: ${JSON.stringify(data)}`,
 				audio: null,
-				replyTo: null
+				replyTo: null,
+				created_at: new Date().toISOString(),
 			};
-			setMessages(prev => [...prev, errorMessage]);
+			setMessages((prev) => [...prev, errorMessage]);
 		};
 
 		const handleMessageSaved = (data) => {
 			console.log("Message saved:", data);
 		};
 
-		websocketService.on('connected', handleConnected);
-		websocketService.on('disconnected', handleDisconnected);
-		websocketService.on('ai_question_result', handleAiResponse);
-		websocketService.on('ai_error', handleAiError);
-		websocketService.on('message_saving_result', handleMessageSaved);
+		websocketService.on("connected", handleConnected);
+		websocketService.on("disconnected", handleDisconnected);
+		websocketService.on("ai_question_result", handleAiResponse);
+		websocketService.on("ai_error", handleAiError);
+		websocketService.on("message_saving_result", handleMessageSaved);
 
 		websocketService.connect();
 
 		return () => {
-			websocketService.off('connected', handleConnected);
-			websocketService.off('disconnected', handleDisconnected);
-			websocketService.off('ai_question_result', handleAiResponse);
-			websocketService.off('ai_error', handleAiError);
-			websocketService.off('message_saving_result', handleMessageSaved);
+			websocketService.off("connected", handleConnected);
+			websocketService.off("disconnected", handleDisconnected);
+			websocketService.off("ai_question_result", handleAiResponse);
+			websocketService.off("ai_error", handleAiError);
+			websocketService.off("message_saving_result", handleMessageSaved);
 		};
 	}, []);
 
@@ -101,22 +104,23 @@ function App() {
 		const userMessage = {
 			id: Date.now(),
 			text: inputValue,
-			type: 'user',
+			type: "user",
 			current_user: true,
-			reply_to: null
+			reply_to: null,
+			created_at: new Date().toISOString(),
 		};
 
-		setMessages(prev => [...prev, userMessage]);
+		setMessages((prev) => [...prev, userMessage]);
 
 		websocketService.sendMessage({
-			text: inputValue
+			text: inputValue,
 		});
 
 		setInputValue("");
 	};
 
 	const handleKeyPress = (e) => {
-		if (e.key === 'Enter') {
+		if (e.key === "Enter") {
 			handleSendMessage();
 		}
 	};
@@ -125,7 +129,7 @@ function App() {
 		<div
 			className={styles.container}
 			style={{ "--bg-image": `url(${$static(Background)})` }}>
-			<div className={styles['top-triangle']}></div>
+			<div className={styles["top-triangle"]}></div>
 			<div className={styles["top-controls-container"]}>
 				<div className={styles["basket-container"]}>
 					<img
@@ -147,40 +151,61 @@ function App() {
 					<div className={styles["loading"]}>Loading chat history...</div>
 				) : (
 					messages.map((message) => (
-						<div key={message.id} className={styles["message"]}>
-							{message.type === 'bot' && (
+						<div
+							key={message.id}
+							className={`${styles["message"]} ${
+								message.current_user ? styles["message-user"] : ""
+							}`}>
+							{message.type === "bot" && !message.current_user && (
 								<img
 									src={$static(AiChatAvatar)}
 									alt='AI Avatar'
 									className={styles["chat-avatar"]}
 								/>
 							)}
-							<div className={styles["message-content"]}>
-								<div className={styles['message-triangle']}></div>
+							<div
+								className={`${styles["message-content"]} ${
+									message.current_user ? styles["message-content-user"] : ""
+								}`}>
+								<div
+									className={`${styles["message-triangle"]} ${
+										message.current_user ? styles["message-triangle-user"] : ""
+									}`}></div>
 								<span className={styles["message-author"]}>
-									{message.type === 'bot' ? 'Carlos' : 
-									 message.current_user ? 'You' : 
-									 message.author_name || 'User'}
+									{message.type === "bot"
+										? "Carlos"
+										: message.current_user
+										? "You"
+										: message.author_name || "User"}
 								</span>
 								{message.reply_to && (
 									<div className={styles["reply-container"]}>
 										<span className={styles["reply-author"]}>
-											{message.reply_to.type === 'bot' ? 'Carlos' :
-											 message.reply_to.current_user ? 'You' :
-											 message.reply_to.author_name || 'User'}
+											{message.reply_to.type === "bot"
+												? "Carlos"
+												: message.reply_to.current_user
+												? "You"
+												: message.reply_to.author_name || "User"}
 										</span>
 										<span className={styles["reply-text"]}>
-											{typeof message.reply_to.text === 'string' ? 
-											 message.reply_to.text : 
-											 JSON.stringify(message.reply_to.text)}
+											{typeof message.reply_to.text === "string"
+												? message.reply_to.text
+												: JSON.stringify(message.reply_to.text)}
 										</span>
 									</div>
 								)}
-								<span className={styles["message-text"]}>
-									{typeof message.text === 'string' ? 
-									 message.text : 
-									 JSON.stringify(message.text)}
-								</span>
+								<div className={styles["message-text-container"]}>
+									<span className={styles["message-text"]}>
+										{typeof message.text === "string"
+											? message.text
+											: JSON.stringify(message.text)}
+									</span>
+									<span className={styles["message-time"]}>
+										{message.created_at
+											? moment(message.created_at).format("HH:mm")
+											: ""}
+									</span>
+								</div>
 							</div>
 						</div>
 					))
@@ -216,4 +241,3 @@ function App() {
 }
 
 export default App;
-									
