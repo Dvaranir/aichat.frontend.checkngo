@@ -1,3 +1,5 @@
+import io from "socket.io-client";
+
 class WebSocketService {
 	constructor() {
 		this.socket = null;
@@ -111,7 +113,7 @@ class WebSocketService {
 				return;
 			}
 
-			window.__cng_common.ajax_call("POST", "/enp/audio_upload", (data) => {
+			window.__cng_common?.ajax_call("POST", "/enp/audio_upload", (data) => {
 				try {
 					const result = JSON.parse(data);
 					const params = {};
@@ -150,7 +152,7 @@ class WebSocketService {
 
 			const params = `tsguid=${encodeURIComponent(sessionGuid)}`;
 
-			window.__cng_common.ajax_call("GET", `/enp/ai_chat/get_history?${params}`, (data) => {
+			window.__cng_common?.ajax_call("GET", `/enp/ai_chat/get_history?${params}`, (data) => {
 				try {
 					const result = JSON.parse(data);
 					resolve(result);
