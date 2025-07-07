@@ -3,7 +3,8 @@ import moment from "moment";
 import websocketService from "./services/websockets.service";
 
 //redux
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setProductsCount } from "./store/slices/basket";
 
 //tools
 import { $static } from "./tools/helpers";
@@ -25,24 +26,47 @@ function App() {
 	const [isConnected, setIsConnected] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 
+	const dispatch = useDispatch();
+
 	const productsCount = useSelector((state) => state.basket.productsCount);
 
 	const inputRef = useRef(null);
 
-	useEffect(() => {
-		const loadHistory = async () => {
-			try {
-				const historyResult = await websocketService.fetchHistory();
-				if (historyResult.success && historyResult.messages) {
-					setMessages(historyResult.messages);
-				}
-			} catch (error) {
-				console.error("Failed to load chat history:", error);
-			} finally {
-				setIsLoading(false);
+	const loadHistory = async () => {
+		try {
+			const historyResult = await websocketService.fetchHistory();
+			if (historyResult.success && historyResult.messages) {
+				setMessages(historyResult.messages);
 			}
-		};
+		} catch (error) {
+			console.error("Failed to load chat history:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
+	const loadBasket = () => {
+		if(productsCount) return;
+
+		let basketCountResult;
+
+		const basketDomCount = document.querySelector('#cng_menu_bottom_cart .cng-cart-value');
+		if (basketDomCount) {
+			const count = parseInt(basketDomCount.textContent);
+			if (!isNaN(count)) {
+				basketCountResult = count;
+			}
+		} else {
+			// TODO: Implement API call to fetch basket count
+		}
+
+		if(!basketCountResult) return;
+
+		dispatch(setProductsCount(basketCountResult));
+	}
+
+	useEffect(() => {
+		loadBasket();
 		loadHistory();
 	}, []);
 

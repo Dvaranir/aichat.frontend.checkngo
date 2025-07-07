@@ -10,5 +10,10 @@
 #cng_ai_chat button {
     border: none;
     outline: none;
+} 
+
+#cng_ai_chat{
+    position: relative;
+    z-index: 1000;
 }
 
